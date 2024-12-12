@@ -2,23 +2,20 @@ import { generateTokenAndSetCookie } from '../lib/utils/generateToken.js';
 import logger from '../lib/utils/logger.js';
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
+import { signUpSchema } from '../services/userValidation.js';
+import { z } from 'zod';
 
 export const signUp = async (req, res) => {
   try {
-    const { username, fullname, email, password } = req.body;
+    const { username, fullname, email, password } = signUpSchema.parse(
+      req.body
+    );
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ Error: 'Invalid email format' });
-    }
-
-    const existingUser = User.findOne({ username });
-    if (existingUser) {
+    if (await User.findOne({ username })) {
       return res.status(400).json({ Error: 'Username is already taken' });
     }
 
-    const existingEmail = User.findOne({ email });
-    if (existingEmail) {
+    if (await User.findOne({ email })) {
       return res.status(400).json({ Error: 'Email is already taken' });
     }
 
@@ -55,6 +52,11 @@ export const signUp = async (req, res) => {
       res.status(400).json({ Error: 'Invalid user data' });
     }
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      // Handle validation errors
+      const errors = err.errors.map((e) => e.message);
+      return res.status(400).json({ error: errors });
+    }
     logger.error(`Error in signup controller: ${err.message}`);
     res.status(500).json({ Error: `Internal server error: ${err.message}` });
   }
@@ -63,7 +65,9 @@ export const signUp = async (req, res) => {
 // @Login Controller
 export const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    // The controller extracts the validated fields (username and password)
+    // to use them for logic
+    const { username, password } = req.validatedBody;
 
     const user = await User.findOne({ username });
     const isPasswordCorrect = await bcrypt.compare(
