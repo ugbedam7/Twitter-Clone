@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { NotificationTypeValues } from '../services/notificationTypes.js';
+import { NotificationTypeValues } from '../services/notification.js';
 
 const notificationSchema = new Schema(
   {

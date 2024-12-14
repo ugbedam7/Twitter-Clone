@@ -1,10 +1,10 @@
 import logger from '../lib/utils/logger.js';
-import { createNotification } from '../services/notificationTypes.js';
+import { createNotification } from '../services/notification.js';
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import {
-  deleteFromCloudinary,
-  uploadToCloudinary
+  deleteProfileImageFromCloudinary,
+  uploadProfileImageToCloudinary
 } from '../services/cloudinary.js';
 import { validateUpdateProfile } from '../services/userValidation.js';
 
@@ -164,13 +164,13 @@ export const updateUserProfile = async (req, res) => {
     if (profileImg) {
       // Delete existing image from Cloudinary if exists
       if (user.profileImg) {
-        await deleteFromCloudinary(user.profileImg);
+        await deleteProfileImageFromCloudinary(user.profileImg);
       }
 
       // Upload new image
-      const uploadedResponse = await uploadToCloudinary(
+      const uploadedResponse = await uploadProfileImageToCloudinary(
         profileImg,
-        'X-profile_images'
+        'X-Profile_Images'
       );
       profileImg = uploadedResponse.secure_url;
     }
@@ -178,13 +178,13 @@ export const updateUserProfile = async (req, res) => {
     // Cover image update
     if (coverImg) {
       if (user.coverImg) {
-        await deleteFromCloudinary(user.coverImg);
+        await deleteProfileImageFromCloudinary(user.coverImg);
       }
 
       // Upload new cover image
-      const uploadedResponse = await uploadToCloudinary(
+      const uploadedResponse = await uploadProfileImageToCloudinary(
         coverImg,
-        'X-cover_images'
+        'X-Cover_Images'
       );
       coverImg = uploadedResponse.secure_url;
     }
