@@ -69,7 +69,7 @@ export const getFollowingPosts = async (req, res) => {
     const feedPosts = await Post.find({ user: { $in: following } })
       .sort({ createdAt: -1 })
       .populate({ path: 'user', select: '-password' })
-      .populate({ path: 'comments.use', select: '-password' });
+      .populate({ path: 'comments.user', select: '-password' });
 
     res.status(200).json({ success: true, feedPosts });
   } catch (err) {
@@ -147,7 +147,7 @@ export const createPost = async (req, res) => {
       data: newPost
     });
   } catch (err) {
-    logger.error(`Error creating post: ${error.message}`);
+    logger.error(`Error creating post: ${err.message}`);
     res.status(500).json({
       success: false,
       message: `Internal server error: ${err.message}`
@@ -217,7 +217,10 @@ export const commentOnPost = async (req, res) => {
     });
   } catch (err) {
     logger.error(`Error in comment on post controller: ${err.message}`);
-    res.status(500).json({ Error: `Internal server error: ${err.message}` });
+    res.status(500).json({
+      success: false,
+      Error: `Internal server error: ${err.message}`
+    });
   }
 };
 
