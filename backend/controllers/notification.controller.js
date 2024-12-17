@@ -44,8 +44,9 @@ export const deleteNotifications = async (req, res) => {
 // Delete One Notification
 export const deleteNotification = async (req, res) => {
   try {
-    const { notificationId } = req.params;
     const userId = req.user._id;
+    const { notificationId } = req.params;
+
     const notification = await Notification.findById(notificationId);
 
     // Check if notification exist
