@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import XSvg from '../../../components/svgs/X';
 import { MdOutlineMail } from 'react-icons/md';
@@ -6,7 +7,9 @@ import { FaUser } from 'react-icons/fa';
 import { MdPassword } from 'react-icons/md';
 import { MdDriveFileRenameOutline } from 'react-icons/md';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
+let result;
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
     email: '',
@@ -15,16 +18,58 @@ const SignUpPage = () => {
     password: ''
   });
 
+  const queryClient = useQueryClient();
+
+  const { mutate, isError, isPending, error } = useMutation({
+    mutationFn: async ({ email, username, fullname, password }) => {
+      try {
+        const res = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            username,
+            fullname,
+            password
+          })
+        });
+        result = await res.json();
+
+        if (!res.ok) {
+          throw new Error(result.error || 'Error creating account!');
+        }
+
+        setFormData({
+          email: '',
+          username: '',
+          fullname: '',
+          password: ''
+        });
+
+        return result;
+      } catch (err) {
+        console.error(err.message);
+        toast.error(err.message);
+        throw err;
+      }
+    },
+    onSuccess: () => {
+      toast.success(result.message);
+      queryClient.invalidateQueries({ queryKey: ['authUser'] });
+    }
+  });
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    mutate(formData);
   };
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const isError = false;
   return (
     <div className="max-w-screen-xl mx-auto flex h-screen px-10">
       <div className="flex-1 hidden lg:flex items-center justify-center">
@@ -79,14 +124,20 @@ const SignUpPage = () => {
               className="grow"
               placeholder="Password"
               name="password"
-              value={formData.passord}
+              value={formData.password}
               onChange={handleInputChange}
             />
           </label>
           <button className="btn rounded-full btn-primary text-white">
-            Sign Up
+            {isPending ? (
+              <span className="flex justify-center items-center">
+                <img src="/spinner.gif" alt="spinner" height={25} width={25} />
+              </span>
+            ) : (
+              'Sign Up'
+            )}
           </button>
-          {isError && <p className="text-red-500">Something went wrong</p>}
+          {isError && <p className="text-red-500">{error.message}</p>}
         </form>
         <div className="flex flex-col gap-2 mt-4 lg:w-2/3">
           <p className="text-lg text-white">Already have an account?</p>

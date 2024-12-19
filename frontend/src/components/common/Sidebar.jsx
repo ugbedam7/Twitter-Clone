@@ -1,17 +1,37 @@
 import XSvg from '../svgs/X';
-
 import { MdHomeFilled } from 'react-icons/md';
 import { IoNotifications } from 'react-icons/io5';
 import { FaUser } from 'react-icons/fa';
 import { BiLogOut } from 'react-icons/bi';
 import { Link } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+
+let result;
 
 const Sidebar = () => {
-  const data = {
-    fullname: 'John Doe',
-    username: 'johndoe',
-    profileImg: '/avatars/boy1.png'
-  };
+  const queryClient = useQueryClient();
+
+  const { mutate: logOut } = useMutation({
+    mutationFn: async () => {
+      const res = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error || 'Something went wrong');
+      }
+    },
+    onSuccess: () => {
+      toast.success(result.message);
+      queryClient.invalidateQueries({ queryKey: ['authUser'] });
+    }
+  });
+
+  const { data } = useQuery({ queryKey: ['authUser'] });
+
   return (
     <div className="md:flex-[2_2_0] w-18 max-w-52">
       <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 w-20 md:w-full">
@@ -60,7 +80,13 @@ const Sidebar = () => {
                 </p>
                 <p className="text-slate-500 text-sm">@{data?.username}</p>
               </div>
-              <BiLogOut className="w-5 h-5 cursor-pointer" />
+              <BiLogOut
+                className="w-5 h-5 cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  logOut();
+                }}
+              />
             </div>
           </Link>
         )}

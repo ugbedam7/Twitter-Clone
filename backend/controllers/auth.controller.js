@@ -11,12 +11,12 @@ export const signUp = async (req, res) => {
       req.body
     );
 
-    if (await User.findOne({ username })) {
-      return res.status(400).json({ Error: 'Username is already taken' });
+    if (await User.findOne({ email })) {
+      return res.status(400).json({ error: 'Email is already taken' });
     }
 
-    if (await User.findOne({ email })) {
-      return res.status(400).json({ Error: 'Email is already taken' });
+    if (await User.findOne({ username })) {
+      return res.status(400).json({ error: 'Username is already taken' });
     }
 
     // Hash the password
@@ -49,7 +49,7 @@ export const signUp = async (req, res) => {
         }
       });
     } else {
-      res.status(400).json({ Error: 'Invalid user data' });
+      res.status(400).json({ error: 'Invalid user data' });
     }
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -76,7 +76,7 @@ export const login = async (req, res) => {
     );
 
     if (!user || !isPasswordCorrect) {
-      return res.status(400).json({ Error: 'Invalid credentials' });
+      return res.status(400).json({ error: 'Invalid credentials' });
     }
 
     generateTokenAndSetCookie(user._id, res);
@@ -104,6 +104,8 @@ export const login = async (req, res) => {
 
 // @Logout Controller
 export const logout = async (req, res) => {
+  // Destroy the session or invalidates the token when
+  // the user logs out
   try {
     res.cookie('token', '', {
       httpOnly: true,
@@ -111,18 +113,31 @@ export const logout = async (req, res) => {
       sameSite: 'strict',
       expires: new Date(0)
     });
-    res.status(200).json({ message: 'User logged out.' });
+
+    res.status(200).json({
+      success: true,
+      message: 'User logged out.'
+    });
   } catch (err) {
     logger.error(`Error in logout controller: ${err.message}`);
     res.status(500).json({
-      Error: `Internal server error: ${err.message}`
+      success: false,
+      error: `Internal server error: ${err.message}`
     });
   }
 };
 
 export const authCheck = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    // Check if user's session or authentication token is still valid.
+    const user = await User.findById(req.user._id).select('-password');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found!'
+      });
+    }
+
     res.status(200).json(user);
   } catch (error) {
     logger.error(`Error in authCheck controller: ${err.message}`);

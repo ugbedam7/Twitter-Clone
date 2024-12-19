@@ -1,18 +1,10 @@
 import { z } from 'zod';
 
 const loginSchema = z.object({
-  username: z
-    .string({
-      required_error: 'Username is required',
-      invalid_type_error: 'Password must be a string'
-    })
-    .min(1, 'Username should not empty'),
+  username: z.string().min(1, 'Username is required'),
   password: z
-    .string({
-      required_error: 'Password is required',
-      invalid_type_error: 'Password must be a string'
-    })
-    .min(1, 'Username should not empty')
+    .string()
+    .min(1, 'Password is required')
     .min(6, 'Password must be at least 6 characters long')
 });
 
@@ -27,6 +19,6 @@ export const validateLogin = (req, res, next) => {
     req.validatedBody = validatedData; // Attach validated data to req
     next(); // Proceed to the controller if validation succeeds
   } catch (err) {
-    return res.status(400).json({ Error: err.errors.map((e) => e.message) });
+    return res.status(400).json({ error: err.errors.map((e) => e.message) });
   }
 };
