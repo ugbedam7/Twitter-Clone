@@ -73,10 +73,15 @@ const LoginPage = () => {
       </div>
       <div className="flex-1 flex flex-col justify-center items-center">
         <form
-          className="lg:w-2/3 mx-auto md:mx-20 flex gap-4 flex-col"
+          className="lg:w-2/3 mx-auto md:mx-20 flex  gap-4 flex-col"
           onSubmit={handleSubmit}>
-          <XSvg className="w-24 fill-white lg:hidden" />
-          <h1 className="text-4xl font-extrabold text-white">{"Let's"} Go.</h1>
+          <div className="flex justify-center">
+            <XSvg className="w-24 fill-white lg:hidden" />
+          </div>
+
+          <h1 className="text-center text-4xl font-extrabold text-white">
+            {"Let's"} Go.
+          </h1>
 
           <label className="input input-bordered flex items-center gap-2">
             <FaUser />

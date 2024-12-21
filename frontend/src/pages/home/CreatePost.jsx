@@ -94,10 +94,16 @@ export default CreatePost;
 
 /**
  * Why Use useRef Here?
-    1.Avoiding Re-renders: Unlike state, updating a ref does not cause the component to re-render. This makes it an efficient way to interact with the DOM for tasks like file input.
-
-    2.Direct DOM Manipulation: React provides an abstraction over the DOM, but useRef allows you to directly access and manipulate a DOM node when needed (e.g., triggering a click event programmatically).
-
-    3.Clean Separation of UI and Logic: Using a ref keeps the <input> hidden while allowing another UI element (like the icon) to handle user interactions.
+ * 1.Avoiding Re-renders: Unlike state, updating a ref does not cause the
+ * component to re-render. This makes it an efficient way to interact with
+ * the DOM for tasks like file input.
+ * 
+ * 2.Direct DOM Manipulation: React provides an abstraction over the DOM, but
+ * useRef allows you to directly access and manipulate a DOM node when need
+ * (e.g., triggering a click event programmatically).
+ * 
+ * 3.Clean Separation of UI and Logic: Using a ref keeps the <input> hidden
+ * while allowing another UI element (like the icon) to handle user
+ * interactions.
 
 */

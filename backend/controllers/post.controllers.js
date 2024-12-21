@@ -13,15 +13,15 @@ export const getAllPosts = async (req, res) => {
       .populate({ path: 'comments.user', select: '-password' });
 
     if (posts.length === 0) {
-      res.status(200).json([]);
+      return res.status(200).json([]);
     }
 
     res.status(200).json({ Count: posts.length, posts });
-  } catch (error) {
+  } catch (err) {
     logger.error(`Error in likeUnlikePost controller: ${err.message}`);
     res.status(500).json({
       success: false,
-      Error: `Internal server error: ${err.message}`
+      error: `Internal server error: ${err.message}`
     });
   }
 };
@@ -33,9 +33,7 @@ export const getLikedPosts = async (req, res) => {
   try {
     const user = await User.findById(userId);
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'User not found!' });
+      return res.status(404).json({ success: false, error: 'User not found!' });
     }
 
     const likedPosts = await Post.find({ _id: { $in: user.likedPosts } })
@@ -47,7 +45,7 @@ export const getLikedPosts = async (req, res) => {
     logger.error(`Error in getLikedPosts controller: ${err.message}`);
     res.status(500).json({
       success: false,
-      Error: `Internal server error: ${err.message}`
+      error: `Internal server error: ${err.message}`
     });
   }
 };
@@ -59,9 +57,7 @@ export const getFollowingPosts = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'User not found!' });
+      return res.status(404).json({ success: false, error: 'User not found!' });
     }
 
     const following = user.following;
@@ -76,7 +72,7 @@ export const getFollowingPosts = async (req, res) => {
     logger.error(`Error in getFollowingPosts controller: ${err.message}`);
     res.status(500).json({
       success: false,
-      Error: `Internal server error: ${err.message}`
+      error: `Internal server error: ${err.message}`
     });
   }
 };
@@ -88,9 +84,7 @@ export const getUserPosts = async (req, res) => {
 
     const user = await User.findOne({ username });
     if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: 'User not found!' });
+      return res.status(404).json({ success: false, error: 'User not found!' });
 
     const posts = await Post.find({ user: user._id })
       .sort({ createdAt: -1 })
@@ -102,7 +96,7 @@ export const getUserPosts = async (req, res) => {
     logger.error(`Error in getUserPosts controller: ${err.message}`);
     res.status(500).json({
       success: false,
-      Error: `Internal server error: ${err.message}`
+      error: `Internal server error: ${err.message}`
     });
   }
 };
@@ -117,13 +111,15 @@ export const createPost = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: 'User not found' });
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+
     if (!text && !img)
       return res
         .status(400)
-        .json({ success: false, message: 'Post must have text or image' });
+        .json({ success: false, error: 'Post must have text or image' });
 
     // Upload image if available
     if (img) {
@@ -150,7 +146,7 @@ export const createPost = async (req, res) => {
     logger.error(`Error creating post: ${err.message}`);
     res.status(500).json({
       success: false,
-      message: `Internal server error: ${err.message}`
+      error: `Internal server error: ${err.message}`
     });
   }
 };
@@ -159,12 +155,12 @@ export const createPost = async (req, res) => {
 export const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ Error: 'Post not found!' });
+    if (!post) return res.status(404).json({ error: 'Post not found!' });
 
     if (post.user.toString() !== req.user._id.toString()) {
       return res
         .status(401)
-        .json({ Error: "'Unauthorized! You can't delete this post" });
+        .json({ error: "Unauthorized: You can't delete this post" });
     }
 
     if (post.img) {
@@ -219,7 +215,7 @@ export const commentOnPost = async (req, res) => {
     logger.error(`Error in comment on post controller: ${err.message}`);
     res.status(500).json({
       success: false,
-      Error: `Internal server error: ${err.message}`
+      error: `Internal server error: ${err.message}`
     });
   }
 };
@@ -232,9 +228,10 @@ export const likeUnlikePost = async (req, res) => {
 
     const post = await Post.findById(postId);
     if (!post) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'Post not found' });
+      return res.status(404).json({
+        success: false,
+        error: 'Post not found'
+      });
     }
 
     const userLikedPost = post.likes.includes(userId);
@@ -260,7 +257,7 @@ export const likeUnlikePost = async (req, res) => {
     logger.error(`Error in likeUnlikePost controller: ${err.message}`);
     res.status(500).json({
       success: false,
-      Error: `Internal server error: ${err.message}`
+      error: `Internal server error: ${err.message}`
     });
   }
 };

@@ -5,7 +5,7 @@ const loginSchema = z.object({
   password: z
     .string()
     .min(1, 'Password is required')
-    .min(6, 'Password must be at least 6 characters long')
+    .min(6, 'Password must be at least 6 characters.')
 });
 
 // ValidateLogin middleware checks that req.body adheres to the schema
@@ -13,9 +13,9 @@ const loginSchema = z.object({
 
 export const validateLogin = (req, res, next) => {
   try {
-    loginSchema.parse(req.body); // Validate the request body
+    // Validate and parse the request body
+    const validatedData = loginSchema.parse(req.body);
 
-    const validatedData = loginSchema.parse(req.body); // Validate and parse data
     req.validatedBody = validatedData; // Attach validated data to req
     next(); // Proceed to the controller if validation succeeds
   } catch (err) {
