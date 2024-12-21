@@ -1,4 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
+import logger from '../lib/utils/logger.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Configure Cloudinary with your credentials
 cloudinary.config({
@@ -33,6 +36,7 @@ export const deleteProfileImageFromCloudinary = async (imageUrl) => {
 // Upload Post Image
 export const uploadPostImageToCloudinary = async (file, folder) => {
   try {
+    logger.info(`Successfully uploaded post image: ${publicId}`);
     return await cloudinary.uploader.upload(file, {
       folder: `${folder}`,
       transformation: [{ width: 500, crop: 'scale' }, { quality: 'auto' }]

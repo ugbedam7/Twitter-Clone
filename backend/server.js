@@ -1,5 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
+dotenv.config();
+
 import authRoutes from './routes/auth.route.js';
 import userRoutes from './routes/user.route.js';
 import postRoutes from './routes/post.route.js';
@@ -8,13 +10,12 @@ import dbConnect from './db/connectDb.js';
 import cookieParser from 'cookie-parser';
 import logger from './lib/utils/logger.js';
 
-dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 8000;
 
 // Middlewares
-app.use(express.json());
+app.use(express.json({ limit: '50mb' })); // To parse JSON data
+// To parse form data(urlencoded)
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
