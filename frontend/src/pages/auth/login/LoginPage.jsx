@@ -6,7 +6,7 @@ import { FaUser } from 'react-icons/fa';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
-let result;
+let result = null;
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({

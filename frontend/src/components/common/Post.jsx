@@ -5,16 +5,51 @@ import { FaRegBookmark } from 'react-icons/fa6';
 import { FaTrash } from 'react-icons/fa';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
+import LoadingSpinner from './LoadingSpinner';
+
+let result = null;
 
 const Post = ({ post }) => {
   const [comment, setComment] = useState('');
+  const { data: authUser } = useQuery({ queryKey: ['authUser'] });
+  const queryClient = useQueryClient();
+
+  const { mutate: deletePost, isPending } = useMutation({
+    mutationFn: async () => {
+      try {
+        const res = await fetch(`/api/posts/${post._id}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+
+        result = await res.json();
+        if (!res.ok) {
+          throw new Error(result.error || 'Something went wrong');
+        }
+        return result;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+
+    onSuccess: () => {
+      toast.success(result.message);
+      // Invalidate the posts query to refetch the updated posts
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    }
+  });
+
   const postOwner = post.user;
   const isLiked = false;
-  const isMyPost = true;
+  const isMyPost = authUser?._id === post.user._id;
   const formattedDate = '1h';
   const isCommenting = false;
 
-  const handleDeletePost = () => {};
+  const handleDeletePost = () => {
+    deletePost();
+  };
 
   const handlePostComment = (e) => {
     e.preventDefault();
@@ -35,7 +70,7 @@ const Post = ({ post }) => {
         <div className="flex flex-col flex-1">
           <div className="flex gap-2 items-center">
             <Link to={`/profile/${postOwner.username}`} className="font-bold">
-              {postOwner.fullName}
+              {postOwner.fullname}
             </Link>
             <span className="text-gray-700 flex gap-1 text-sm">
               <Link to={`/profile/${postOwner.username}`}>
@@ -46,10 +81,14 @@ const Post = ({ post }) => {
             </span>
             {isMyPost && (
               <span className="flex justify-end flex-1">
-                <FaTrash
-                  className="cursor-pointer hover:text-red-500"
-                  onClick={handleDeletePost}
-                />
+                {!isPending && (
+                  <FaTrash
+                    className="cursor-pointer hover:text-red-500"
+                    onClick={handleDeletePost}
+                  />
+                )}
+
+                {isPending && <LoadingSpinner size="sm" />}
               </span>
             )}
           </div>
@@ -77,12 +116,12 @@ const Post = ({ post }) => {
                   {post.comments.length}
                 </span>
               </div>
-              {/* We're using Modal Component from DaisyUI */}
+              {/* Modal Component from DaisyUI */}
               <dialog
                 id={`comments_modal${post._id}`}
                 className="modal border-none outline-none">
                 <div className="modal-box rounded border border-gray-600">
-                  <h3 className="font-bold text-lg mb-4">COMMENTS</h3>
+                  <h3 className="font-bold text-lg mb-4">Comment</h3>
                   <div className="flex flex-col gap-3 max-h-60 overflow-auto">
                     {post.comments.length === 0 && (
                       <p className="text-sm text-slate-500">
@@ -120,12 +159,12 @@ const Post = ({ post }) => {
                     onSubmit={handlePostComment}>
                     <textarea
                       className="textarea w-full p-1 rounded text-md resize-none border focus:outline-none  border-gray-800"
-                      placeholder="Add a comment..."
+                      placeholder="Post your reply"
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
                     />
                     <button className="btn btn-primary rounded-full btn-sm text-white px-4">
-                      {isCommenting ? <LoadingSpinner size="md" /> : 'Post'}
+                      {isCommenting ? <LoadingSpinner size="md" /> : 'Reply'}
                     </button>
                   </form>
                 </div>
@@ -133,6 +172,7 @@ const Post = ({ post }) => {
                   <button className="outline-none">close</button>
                 </form>
               </dialog>
+
               <div className="flex gap-1 items-center group cursor-pointer">
                 <BiRepost className="w-6 h-6  text-slate-500 group-hover:text-green-500" />
                 <span className="text-sm text-slate-500 group-hover:text-green-500">

@@ -9,7 +9,8 @@ import { MdDriveFileRenameOutline } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
-let result;
+let result = null;
+
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
     email: '',

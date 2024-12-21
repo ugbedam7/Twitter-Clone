@@ -169,10 +169,16 @@ export const deletePost = async (req, res) => {
 
     await Post.findByIdAndDelete(req.params.id);
     logger.info('Post deleted successfully');
-    res.status(200).json({ message: 'Post deleted successfully' });
+    res.status(200).json({
+      success: true,
+      message: 'Post deleted successfully'
+    });
   } catch (err) {
     logger.error(`Error in delete post controller: ${err.message}`);
-    res.status(500).json({ Error: `Internal Server error: ${err.message}` });
+    res.status(500).json({
+      success: false,
+      error: `Internal Server error: ${err.message}`
+    });
   }
 };
 
@@ -184,14 +190,12 @@ export const commentOnPost = async (req, res) => {
     const userId = req.user._id;
 
     if (!text || text == '') {
-      return res.status(400).json({ Error: 'Text field is required' });
+      return res.status(400).json({ error: 'Text field is required' });
     }
 
     const post = await Post.findById(postId);
     if (!post) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'Post not found' });
+      return res.status(404).json({ success: false, error: 'Post not found' });
     }
 
     const comment = {
