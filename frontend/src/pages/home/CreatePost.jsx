@@ -17,11 +17,7 @@ const CreatePost = () => {
   const { data: authUser } = useQuery({ queryKey: ['authUser'] });
   const queryClient = useQueryClient();
 
-  const {
-    mutate: createPost,
-    isPending,
-    error
-  } = useMutation({
+  const { mutate: createPost, isPending } = useMutation({
     mutationFn: async ({ text, img }) => {
       try {
         const res = await fetch('/api/posts', {
@@ -121,7 +117,7 @@ const CreatePost = () => {
           <button className="btn btn-primary rounded-full btn-sm text-white px-4">
             {isPending ? (
               <span className="flex justify-center items-center">
-                <img src="/spinner.gif" alt="spinner" height={25} width={25} />
+                <img src="/spinner.gif" alt="spinner" height={20} width={20} />
               </span>
             ) : (
               'Post'

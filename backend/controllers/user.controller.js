@@ -37,7 +37,7 @@ export const followUnfollowUser = async (req, res) => {
     }
 
     if (!targetUser || !authenticatedUser) {
-      return res.status(400).json({ Error: 'User not found' });
+      return res.status(400).json({ error: 'User not found' });
     }
 
     const isFollowing = authenticatedUser.following.includes(id);
@@ -64,7 +64,10 @@ export const followUnfollowUser = async (req, res) => {
     }
   } catch (err) {
     logger.error(`Error in followUnfollowUser controller: ${err.message}`);
-    res.status(500).json({ Error: err.message });
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
   }
 };
 
@@ -103,14 +106,14 @@ export const getSuggestedUsers = async (req, res) => {
     // Limit to 4 suggestions
     const limitedSuggestions = suggestedUsers.slice(0, 4);
     res.status(200).json({
-      count: limitedSuggestions.length,
-      data: limitedSuggestions
+      success: true,
+      limitedSuggestions
     });
   } catch (err) {
     logger.error(`Error in suggestedUsers controller: ${err.message}`);
     res.status(500).json({
-      Error: err.message,
-      message: 'Unable to fetch suggested users'
+      success: false,
+      error: `Unable to fetch suggested users: ${err.message}`
     });
   }
 };
@@ -137,9 +140,7 @@ export const updateUserProfile = async (req, res) => {
   try {
     let user = await User.findById(userId);
     if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: 'User not found' });
+      return res.status(404).json({ success: false, error: 'User not found' });
 
     // Password update logic
     if (currentPassword && newPassword) {

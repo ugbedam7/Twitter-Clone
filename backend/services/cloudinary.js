@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import logger from '../lib/utils/logger.js';
 import dotenv from 'dotenv';
+import { response } from 'express';
 dotenv.config();
 
 // Configure Cloudinary with your credentials
@@ -36,11 +37,12 @@ export const deleteProfileImageFromCloudinary = async (imageUrl) => {
 // Upload Post Image
 export const uploadPostImageToCloudinary = async (file, folder) => {
   try {
-    logger.info(`Successfully uploaded post image: ${publicId}`);
-    return await cloudinary.uploader.upload(file, {
+    const updloadResponse = await cloudinary.uploader.upload(file, {
       folder: `${folder}`,
       transformation: [{ width: 500, crop: 'scale' }, { quality: 'auto' }]
     });
+    logger.info(`Successfully uploaded post image`);
+    return updloadResponse;
   } catch (err) {
     logger.error(`Cloudinary upload error: ${err.message}`);
     throw err;

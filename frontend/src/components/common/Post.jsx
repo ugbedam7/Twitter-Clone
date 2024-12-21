@@ -42,8 +42,8 @@ const Post = ({ post }) => {
   });
 
   const postOwner = post.user;
-  const isLiked = false;
   const isMyPost = authUser?._id === post.user._id;
+  const isLiked = false;
   const formattedDate = '1h';
   const isCommenting = false;
 
@@ -72,7 +72,7 @@ const Post = ({ post }) => {
             <Link to={`/profile/${postOwner.username}`} className="font-bold">
               {postOwner.fullname}
             </Link>
-            <span className="text-gray-700 flex gap-1 text-sm">
+            <span className="text-gray-700 flex gap-1 text-base">
               <Link to={`/profile/${postOwner.username}`}>
                 @{postOwner.username}
               </Link>

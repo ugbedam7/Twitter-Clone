@@ -1,7 +1,10 @@
 import logger from '../lib/utils/logger.js';
 import Post from '../models/post.model.js';
 import User from '../models/user.model.js';
-import { uploadPostImageToCloudinary } from '../services/cloudinary.js';
+import {
+  deletePostImageFromCloudinary,
+  uploadPostImageToCloudinary
+} from '../services/cloudinary.js';
 import { createNotification } from '../services/notification.js';
 
 // Get All Posts
