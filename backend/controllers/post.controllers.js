@@ -197,7 +197,10 @@ export const commentOnPost = async (req, res) => {
 
     const post = await Post.findById(postId);
     if (!post) {
-      return res.status(404).json({ success: false, error: 'Post not found' });
+      return res.status(404).json({
+        success: false,
+        error: 'Post not found'
+      });
     }
 
     const comment = {
@@ -207,14 +210,14 @@ export const commentOnPost = async (req, res) => {
 
     post.comments.push(comment);
     await post.save();
-    logger.info('Comment created successfully');
+    logger.info('Comment posted successfully');
 
     // Send comment notification
     await createNotification(userId, post.user, 'comment');
 
     res.status(200).json({
       success: true,
-      message: 'Comment created successfully',
+      message: 'Comment posted successfully',
       post
     });
   } catch (err) {
