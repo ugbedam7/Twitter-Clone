@@ -31,9 +31,10 @@ export const followUnfollowUser = async (req, res) => {
     const authenticatedUser = await User.findById(req.user._id);
 
     if (id === req.user._id.toString()) {
-      return res
-        .status(400)
-        .json({ Error: "You can't follow or unofollow yourself" });
+      return res.status(400).json({
+        success: false,
+        error: "You can't follow or unfollow yourself"
+      });
     }
 
     if (!targetUser || !authenticatedUser) {
@@ -43,13 +44,14 @@ export const followUnfollowUser = async (req, res) => {
     const isFollowing = authenticatedUser.following.includes(id);
 
     if (isFollowing) {
-      // Unfollow the uswer
+      // Unfollow the user
       await User.findByIdAndUpdate(id, { $pull: { followers: req.user._id } });
       await User.findByIdAndUpdate(req.user._id, { $pull: { following: id } });
 
-      // TODO return the Id of the user as a response
-
-      res.status(200).json({ message: 'User unfollowed successfully' });
+      res.status(200).json({
+        success: true,
+        message: 'User unfollowed successfully'
+      });
     } else {
       // Follow the user
       await User.findByIdAndUpdate(id, { $push: { followers: req.user._id } });
@@ -58,12 +60,13 @@ export const followUnfollowUser = async (req, res) => {
       // Send a notfication to the user
       await createNotification(req.user._id, targetUser._id, 'follow');
 
-      // TODO return the Id of the user as a response
-
-      res.status(200).json({ message: 'User followed successfully' });
+      res.status(200).json({
+        success: true,
+        message: 'User followed successfully'
+      });
     }
   } catch (err) {
-    logger.error(`Error in followUnfollowUser controller: ${err.message}`);
+    logger.error(`error in followUnfollowUser controller: ${err.message}`);
     res.status(500).json({
       success: false,
       error: err.message

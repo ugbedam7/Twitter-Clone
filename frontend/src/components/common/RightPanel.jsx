@@ -2,6 +2,7 @@ import React from 'react';
 import RightPanelSkeleton from '../skeletons/RightPanelSkeleton';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import useFollow from '../../hooks/useFollow,jsx';
 
 const RightPanel = () => {
   const { data: suggestedUsers, isLoading } = useQuery({
@@ -15,14 +16,17 @@ const RightPanel = () => {
           throw new Error(data.error || 'Something went wrong');
         }
 
-        return data.limitedSuggestions;
+        return data.limitedSuggestions || [];
       } catch (error) {
         throw new Error(error);
       }
     }
   });
 
-  if (suggestedUsers.length === 0) return <div className="md:w-64 w-0"></div>;
+  const { follow, isPending } = useFollow();
+
+  if (!suggestedUsers || suggestedUsers.length === 0)
+    return <div className="md:w-64 w-0">No suggested users to follow</div>;
 
   return (
     <div className="hidden lg:block my-4 mx-2">
@@ -66,7 +70,18 @@ const RightPanel = () => {
                       e.preventDefault();
                       follow(user._id);
                     }}>
-                    Follow
+                    {isPending ? (
+                      <span className="flex justify-center items-center">
+                        <img
+                          src="/spinner.gif"
+                          alt="spinner"
+                          height={20}
+                          width={20}
+                        />
+                      </span>
+                    ) : (
+                      'Follow'
+                    )}
                   </button>
                 </div>
               </Link>
