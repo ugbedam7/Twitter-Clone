@@ -38,7 +38,10 @@ export const followUnfollowUser = async (req, res) => {
     }
 
     if (!targetUser || !authenticatedUser) {
-      return res.status(400).json({ error: 'User not found' });
+      return res.status(400).json({
+        success: false,
+        error: 'User not found'
+      });
     }
 
     const isFollowing = authenticatedUser.following.includes(id);
@@ -155,7 +158,7 @@ export const updateUserProfile = async (req, res) => {
       if (!isPasswordValid) {
         return res.status(400).json({
           success: false,
-          message: 'Current password is incorrect'
+          error: 'Current password is incorrect'
         });
       }
 
@@ -227,7 +230,7 @@ export const updateUserProfile = async (req, res) => {
     logger.error(`Profile update error for user ${userId}: ${err.message}`);
     res.status(500).json({
       success: false,
-      message: `Internal server error: ${err.message}`
+      error: `Internal server error: ${err.message}`
     });
   }
 };

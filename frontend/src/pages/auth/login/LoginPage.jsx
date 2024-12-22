@@ -6,8 +6,6 @@ import { FaUser } from 'react-icons/fa';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
-let result = null;
-
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     username: '',
@@ -35,7 +33,7 @@ const LoginPage = () => {
           })
         });
 
-        result = await res.json();
+        const result = await res.json();
         if (!res.ok) {
           throw new Error(result.error || 'Login error');
         }
@@ -44,13 +42,14 @@ const LoginPage = () => {
           username: '',
           password: ''
         });
+        return result;
       } catch (error) {
         console.error(error.message);
         toast.error(error.message);
         throw new Error(error);
       }
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       toast.success(result.message);
       // Refetch the authUser
       queryClient.invalidateQueries({ queryKey: ['authUser'] });

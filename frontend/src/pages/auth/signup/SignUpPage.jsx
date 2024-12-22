@@ -9,8 +9,6 @@ import { MdDriveFileRenameOutline } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
-let result = null;
-
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
     email: '',
@@ -36,7 +34,8 @@ const SignUpPage = () => {
             password
           })
         });
-        result = await res.json();
+
+        const result = await res.json();
 
         if (!res.ok) {
           throw new Error(result.error || 'Error creating account!');
@@ -56,7 +55,7 @@ const SignUpPage = () => {
         throw err;
       }
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       toast.success(result.message);
       queryClient.invalidateQueries({ queryKey: ['authUser'] });
     }

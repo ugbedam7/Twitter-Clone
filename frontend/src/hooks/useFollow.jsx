@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { promise } from 'zod';
+import toast from 'react-hot-toast';
 
 const useFollow = () => {
   const queryQlient = useQueryClient();
@@ -12,20 +12,21 @@ const useFollow = () => {
           credentials: 'include'
         });
 
-        const data = await res.json();
+        const result = await res.json();
 
         if (!res.ok) {
-          throw new Error(data.error || 'Something went wrong!');
+          throw new Error(result.error || 'Something went wrong!');
         }
 
-        return;
-      } catch (error) {
-        throw new Error(error.message);
+        return result;
+      } catch (err) {
+        throw new Error(err.message);
       }
     },
 
-    onSuccess: () => {
-      promise.call([
+    onSuccess: (result) => {
+      toast.success(result.message);
+      Promise.all([
         queryQlient.invalidateQueries({ queryKey: ['suggestedUsers'] }),
         queryQlient.invalidateQueries({ queryKey: ['authUser'] })
       ]);
