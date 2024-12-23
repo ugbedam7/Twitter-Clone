@@ -67,8 +67,8 @@ const Post = ({ post }) => {
       // queryClient.invalidateQueries({ queryKey: ['posts'] });
 
       // Update the cache just for that post
-      queryClient.setQueryData(['posts'], (oldData) => {
-        return oldData.map((p) => {
+      queryClient.setQueryData(['posts'], (prevData) => {
+        return prevData.map((p) => {
           if (p._id === post._id) return { ...p, likes: data.updatedLikes };
           return p;
         });

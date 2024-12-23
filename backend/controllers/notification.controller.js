@@ -12,12 +12,16 @@ export const getNotifications = async (req, res) => {
     });
 
     await Notification.updateMany({ to: userId }, { read: true });
-    res.status(200).json({ Count: notifications.length, notifications });
+
+    res.status(200).json({
+      success: true,
+      notifications
+    });
   } catch (err) {
     logger.error(`Error in getNotification controller: ${err.message}`);
     res.status(500).json({
       success: false,
-      Error: `Internal server error: ${err.message}`
+      error: `Internal server error: ${err.message}`
     });
   }
 };
@@ -27,16 +31,17 @@ export const deleteNotifications = async (req, res) => {
   try {
     const userId = req.user._id;
     await Notification.deleteMany({ to: userId });
-    logger.info('Notifications deleted successfully');
+    logger.info('Notifications deleted');
 
-    res
-      .status(200)
-      .json({ success: true, message: 'Notifications deleted successfully' });
+    res.status(200).json({
+      success: true,
+      message: 'Notifications deleted'
+    });
   } catch (err) {
     logger.error(`Error in deleteNotification controller: ${err.message}`);
     res.status(500).json({
       success: false,
-      Error: `Internal server error: ${err.message}`
+      error: `Internal server error: ${err.message}`
     });
   }
 };
@@ -53,27 +58,29 @@ export const deleteNotification = async (req, res) => {
     if (!notification) {
       return res
         .status(404)
-        .json({ success: false, message: 'Notification not found' });
+        .json({ success: false, error: 'Notification not found' });
     }
 
     // Check for authorization
     if (notification.to.toString() !== userId.toString()) {
       return res.status(403).json({
         success: false,
-        error: 'Unauthorized: Notification cannot be deleted'
+        error: 'Unauthorized!'
       });
     }
 
     await Notification.findByIdAndDelete(notificationId);
-    logger.info('Notification deleted successfully');
-    res
-      .status(200)
-      .json({ success: true, message: 'Notification deleted successfully' });
+    logger.info('Notification deleted');
+
+    res.status(200).json({
+      success: true,
+      message: 'Notification deleted'
+    });
   } catch (err) {
-    logger.error(`Error in deleting notification: ${err.message}`);
+    logger.error(`Error deleting notification: ${err.message}`);
     res.status(500).json({
       success: false,
-      Error: `Internal server error: ${err.message}`
+      error: `Internal server error: ${err.message}`
     });
   }
 };
