@@ -23,6 +23,7 @@ const postSchema = new Schema(
       }
     ],
 
+    // Post schema supports nested comments.
     comments: [
       {
         text: {

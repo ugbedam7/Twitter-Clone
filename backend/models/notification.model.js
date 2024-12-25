@@ -27,6 +27,12 @@ const notificationSchema = new Schema(
     read: {
       type: Boolean,
       default: false
+    },
+
+    post: {
+      // Post that triggered the notification
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post'
     }
   },
 

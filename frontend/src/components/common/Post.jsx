@@ -47,7 +47,7 @@ const Post = ({ post }) => {
   const { mutate: likePost, isPending: isLiking } = useMutation({
     mutationFn: async () => {
       try {
-        const res = await fetch(`/api/posts/like/${post._id}`, {
+        const res = await fetch(`/api/posts/${post._id}/like`, {
           method: 'POST',
           credentials: 'include'
         });
@@ -217,7 +217,7 @@ const Post = ({ post }) => {
                         <div className="flex flex-col">
                           <div className="flex items-center gap-1">
                             <span className="font-bold">
-                              {comment.user.fullName}
+                              {comment.user.fullname}
                             </span>
                             <span className="text-gray-700 text-sm">
                               @{comment.user.username}

@@ -6,10 +6,19 @@ export const getNotifications = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const notifications = await Notification.find({ to: userId }).populate({
-      path: 'from',
-      select: 'username profileImg'
-    });
+    const notifications = await Notification.find({ to: userId })
+      .populate({
+        path: 'from',
+        select: 'fullname username profileImg'
+      })
+      .populate({
+        path: 'post',
+        select: 'text comments user'
+      })
+      .populate({
+        path: 'to',
+        select: 'username'
+      });
 
     await Notification.updateMany({ to: userId }, { read: true });
 

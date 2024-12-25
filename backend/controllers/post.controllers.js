@@ -213,7 +213,10 @@ export const commentOnPost = async (req, res) => {
     logger.info('Comment posted successfully');
 
     // Send comment notification
-    await createNotification(userId, post.user, 'comment');
+    if (comment.user.toString() !== post.user.toString()) {
+      // Create notification for the post author
+      await createNotification(userId, post.user, 'comment', postId);
+    }
 
     res.status(200).json({
       success: true,
@@ -265,7 +268,7 @@ export const likeUnlikePost = async (req, res) => {
       await post.save();
 
       //Send like notification
-      await createNotification(userId, post.user, 'like');
+      await createNotification(userId, post.user, 'like', postId);
 
       res.status(200).json({
         success: true,
