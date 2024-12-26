@@ -156,7 +156,7 @@ export const createPost = async (req, res) => {
 // Delete User Post
 export const deletePost = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.params.postId);
     if (!post) return res.status(404).json({ error: 'Post not found!' });
 
     if (post.user.toString() !== req.user._id.toString()) {
@@ -188,7 +188,7 @@ export const deletePost = async (req, res) => {
 export const commentOnPost = async (req, res) => {
   try {
     const { text } = req.body;
-    const postId = req.params.id;
+    const { postId } = req.params;
     const userId = req.user._id;
 
     if (!text || text == '') {
@@ -212,7 +212,7 @@ export const commentOnPost = async (req, res) => {
     await post.save();
     logger.info('Comment posted successfully');
 
-    // Send comment notification
+    // Send comment notification avoiding self notification
     if (comment.user.toString() !== post.user.toString()) {
       // Create notification for the post author
       await createNotification(userId, post.user, 'comment', postId);
@@ -236,7 +236,7 @@ export const commentOnPost = async (req, res) => {
 export const likeUnlikePost = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { id: postId } = req.params;
+    const { postId } = req.params;
 
     const post = await Post.findById(postId);
     if (!post) {
@@ -267,8 +267,10 @@ export const likeUnlikePost = async (req, res) => {
       await User.updateOne({ _id: userId }, { $push: { likedPosts: postId } });
       await post.save();
 
-      //Send like notification
-      await createNotification(userId, post.user, 'like', postId);
+      //Send like notification avoining self notification
+      if (userId.toString() !== post.user.toString()) {
+        await createNotification(userId, post.user, 'like', postId);
+      }
 
       res.status(200).json({
         success: true,

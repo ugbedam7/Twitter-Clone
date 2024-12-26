@@ -141,7 +141,7 @@ const Post = ({ post }) => {
             <img src={postOwner.profileImg || '/avatar-placeholder.png'} />
           </Link>
         </div>
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col ">
           <div className="flex gap-2 items-center">
             <Link to={`/profile/${postOwner.username}`} className="font-bold">
               {postOwner.fullname}

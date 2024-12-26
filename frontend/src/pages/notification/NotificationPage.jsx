@@ -1,20 +1,14 @@
 import { Link } from 'react-router-dom';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { Gear } from '../../components/svgs/Gear';
-import { FaUser } from 'react-icons/fa';
+import { FaTrash, FaUser } from 'react-icons/fa';
 import { FaHeart } from 'react-icons/fa6';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 import { formatPostDate } from '../../utils/date/date';
-
-const getComment = (notification) => {
-  const comment = notification.post.comments.find(
-    (comment) => comment.user.toString() === notification.from._id.toString()
-  );
-
-  if (comment) return comment.text; // Extract the text of the comment
-};
+import { getCommentText } from '../../utils/helpers/getCommentText';
+import CommentActions from './CommentActions';
 
 const NotificationPage = () => {
   const [feedType, setFeedType] = useState('all');
@@ -42,8 +36,6 @@ const NotificationPage = () => {
     retry: false
   });
 
-  console.log(notifications);
-
   const { mutate: deleteNotifications } = useMutation({
     mutationFn: async () => {
       try {
@@ -65,6 +57,46 @@ const NotificationPage = () => {
     onSuccess: (data) => {
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+
+    onError: (error) => {
+      toast.error(error.message);
+    }
+  });
+
+  const { mutate: deleteNotification, isPending: isDeleting } = useMutation({
+    mutationFn: async (id) => {
+      try {
+        const res = await fetch(`/api/notifications/${id}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || 'Something went wrong');
+        }
+
+        return data;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+
+    onSettled: () => {
+      // refetch notifications
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+
+    onSuccess: (data) => {
+      toast.success(data.message);
+
+      // Directly modifying notifications query's catched data
+      queryClient.setQueryData(['notifications'], (old) => {
+        return old.filter(
+          (notification) => notification._id !== data.notificationId
+        );
+      });
     },
 
     onError: (error) => {
@@ -155,53 +187,50 @@ const NotificationPage = () => {
               {notification.type === 'like' && (
                 <FaHeart className="w-7 h-7 text-pink-500" />
               )}
-              <Link to={`/profile/${notification.from.username}`}>
-                {notification.type !== 'comment' && (
-                  <div className="avatar">
-                    <div className="w-8 rounded-full">
-                      <img
-                        src={
-                          notification.from.profileImg ||
-                          '/avatar-placeholder.png'
-                        }
-                      />
-                    </div>
-                  </div>
-                )}
+
+              <div className="comment-section">
                 {notification.type === 'comment' ? (
-                  <>
-                    <div className="comment">
-                      <div className="flex gap-2">
-                        <span className="font-bold text-white">
+                  <div className="comment flex-1">
+                    <div className="flex gap-2">
+                      <Link to={`/profile/${notification.from.username}`}>
+                        <span className="font-bold text-white pr-1">
                           {notification.from.fullname}
                         </span>
-                        <span className="font-normal text-gray-500">
+                        <span className="font-normal text-gray-500 ">
                           @{notification.from.username}
-                        </span>{' '}
-                        <span>.</span>{' '}
-                        <span>{formatPostDate(notification.createAt)}</span>
-                      </div>
-                      <p className="text-gray-500">
-                        Replying to{' '}
+                        </span>
+                      </Link>
+                      <span>.</span>{' '}
+                      <span>{formatPostDate(notification.createAt)}</span>
+                    </div>
+                    <p className="text-gray-500">
+                      Replying to{' '}
+                      <Link to={`/profile/${notification.to.username}`}>
                         <span className="text-blue-500 mt-2">
                           @{notification.to.username}
                         </span>
-                      </p>
-                    </div>
+                      </Link>
+                    </p>
 
                     {notification.post && (
-                      <div className="comment">
+                      <div className="text">
                         <p className="text-gray-100 mt-3">
-                          {getComment(notification)}
+                          {getCommentText(notification)}
                         </p>
                       </div>
                     )}
-                  </>
+
+                    <div className="comment-actions">
+                      <CommentActions notification={notification} />
+                    </div>
+                  </div>
                 ) : (
                   <>
                     <div className="flex gap-1">
                       <span className="font-bold">
-                        @{notification.from.username}
+                        <Link to={`/profile/${notification.from.username}`}>
+                          @{notification.from.username}
+                        </Link>
                       </span>{' '}
                       {notification.type === 'follow'
                         ? 'followed you'
@@ -217,7 +246,17 @@ const NotificationPage = () => {
                     )}
                   </>
                 )}
-              </Link>
+              </div>
+              <span className="flex justify-end flex-1">
+                {!isDeleting ? (
+                  <FaTrash
+                    className="cursor-pointer hover:text-red-500"
+                    onClick={() => deleteNotification(notification._id)}
+                  />
+                ) : (
+                  <LoadingSpinner size="sm" />
+                )}
+              </span>
             </div>
           </div>
         ))}
@@ -225,4 +264,5 @@ const NotificationPage = () => {
     </>
   );
 };
+
 export default NotificationPage;

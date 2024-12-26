@@ -13,7 +13,7 @@ export const getNotifications = async (req, res) => {
       })
       .populate({
         path: 'post',
-        select: 'text comments user'
+        select: 'text likes comments user'
       })
       .populate({
         path: 'to',
@@ -83,7 +83,8 @@ export const deleteNotification = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Notification deleted'
+      message: 'Notification deleted',
+      notificationId
     });
   } catch (err) {
     logger.error(`Error deleting notification: ${err.message}`);
