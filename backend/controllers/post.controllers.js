@@ -39,11 +39,11 @@ export const getLikedPosts = async (req, res) => {
       return res.status(404).json({ success: false, error: 'User not found!' });
     }
 
-    const likedPosts = await Post.find({ _id: { $in: user.likedPosts } })
+    const posts = await Post.find({ _id: { $in: user.likedPosts } })
       .populate({ path: 'user', select: '-password' })
       .populate({ path: 'comments.user', select: '-password' });
 
-    res.status(200).json({ Count: likedPosts.length, likedPosts });
+    res.status(200).json({ posts });
   } catch (err) {
     logger.error(`Error in getLikedPosts controller: ${err.message}`);
     res.status(500).json({
@@ -94,7 +94,7 @@ export const getUserPosts = async (req, res) => {
       .populate({ path: 'user', select: '-password' })
       .populate({ path: 'comments.user', select: '-password' });
 
-    res.status(200).json({ Count: posts.length, posts });
+    res.status(200).json({ posts });
   } catch (err) {
     logger.error(`Error in getUserPosts controller: ${err.message}`);
     res.status(500).json({

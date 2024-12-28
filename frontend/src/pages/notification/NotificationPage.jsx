@@ -106,54 +106,56 @@ const NotificationPage = () => {
 
   return (
     <>
-      <div className="flex-[4_4_0] border-l border-r border-gray-700 min-h-screen">
-        <div className="flex justify-between items-center p-4">
-          <p className="font-bold text-xl">Notifications</p>
-          <div className="dropdown ">
-            <div tabIndex={0} role="button" className="m-1">
-              <Gear className="font-bold fill-slate-100 h-5" />
+      <div className="flex-[4_4_0] border-l border-r border-gray-700 min-h-screen overflow-hidden">
+        <div className="fixed top-0 w-[53.5%] shadow-md bg-[rgba(0,0,0,0.5)]">
+          <div className="flex justify-between items-center p-4 z-10">
+            <p className="font-bold text-xl">Notifications</p>
+            <div className="dropdown ">
+              <div tabIndex={0} role="button" className="m-1">
+                <Gear className="font-bold fill-slate-100 h-5" />
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                <li>
+                  <a onClick={deleteNotifications}>Delete all notifications</a>
+                </li>
+              </ul>
             </div>
-            <ul
-              tabIndex={0}
-              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-              <li>
-                <a onClick={deleteNotifications}>Delete all notifications</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="flex w-full border-b border-gray-700">
-          <div
-            className={`flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 cursor-pointer relative  ${
-              feedType === 'all' ? 'text-white' : 'text-gray-500'
-            }`}
-            onClick={() => setFeedType('all')}>
-            All
-            {feedType === 'all' && (
-              <div className="absolute bottom-0 w-10 h-1 rounded-full bg-primary"></div>
-            )}
-          </div>
-          <div
-            className={`flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 cursor-pointer relative  ${
-              feedType === 'verified' ? 'text-white' : 'text-gray-500'
-            }`}
-            onClick={() => setFeedType('verified')}>
-            Verified
-            {feedType === 'verified' && (
-              <div className="absolute bottom-0 w-10 h-1 rounded-full bg-primary"></div>
-            )}
           </div>
 
-          <div
-            className={`flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 cursor-pointer relative ${
-              feedType === 'mentions' ? 'text-white' : 'text-gray-500'
-            }`}
-            onClick={() => setFeedType('mentions')}>
-            Mentions
-            {feedType === 'mentions' && (
-              <div className="absolute bottom-0 w-10 h-1 rounded-full bg-primary"></div>
-            )}
+          <div className="flex w-full border-b border-gray-700">
+            <div
+              className={`flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 cursor-pointer relative  ${
+                feedType === 'all' ? 'text-white' : 'text-gray-500'
+              }`}
+              onClick={() => setFeedType('all')}>
+              All
+              {feedType === 'all' && (
+                <div className="absolute bottom-0 w-10 h-1 rounded-full bg-primary"></div>
+              )}
+            </div>
+            <div
+              className={`flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 cursor-pointer relative  ${
+                feedType === 'verified' ? 'text-white' : 'text-gray-500'
+              }`}
+              onClick={() => setFeedType('verified')}>
+              Verified
+              {feedType === 'verified' && (
+                <div className="absolute bottom-0 w-10 h-1 rounded-full bg-primary"></div>
+              )}
+            </div>
+
+            <div
+              className={`flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 cursor-pointer relative ${
+                feedType === 'mentions' ? 'text-white' : 'text-gray-500'
+              }`}
+              onClick={() => setFeedType('mentions')}>
+              Mentions
+              {feedType === 'mentions' && (
+                <div className="absolute bottom-0 w-10 h-1 rounded-full bg-primary"></div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -162,9 +164,12 @@ const NotificationPage = () => {
             <LoadingSpinner size="lg" />
           </div>
         )}
-        {notifications?.length === 0 && (
+
+        {(!notifications || notifications?.length === 0) && (
           <div className="text-center p-4 font-bold">No notifications 🤔</div>
         )}
+
+        <div className="mt-28"></div>
         {notifications?.map((notification) => (
           <div className="border-b border-gray-700" key={notification._id}>
             <div className="flex gap-2 p-4">
@@ -201,7 +206,7 @@ const NotificationPage = () => {
                         </span>
                       </Link>
                       <span>.</span>{' '}
-                      <span>{formatPostDate(notification.createAt)}</span>
+                      <span>{formatPostDate(notification.createdAt)}</span>
                     </div>
                     <p className="text-gray-500">
                       Replying to{' '}

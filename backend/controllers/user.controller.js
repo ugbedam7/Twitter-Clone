@@ -14,12 +14,19 @@ export const getUserProfile = async (req, res) => {
 
   try {
     const user = await User.findOne({ username }).select('-password');
-    if (!user) return res.status(404).json({ Error: 'User not found' });
+    if (!user)
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
 
-    res.status(200).json(user);
+    res.status(200).json({ success: true, user });
   } catch (err) {
     logger.error(`Error in getUserProfile controller: ${err.message}`);
-    res.status(500).json({ Error: err.message });
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
   }
 };
 
