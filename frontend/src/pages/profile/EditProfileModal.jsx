@@ -1,9 +1,7 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import useUpdateUserProfile from '../../hooks/useUpdateUserProfile';
 
 const EditProfileModal = ({ authUser }) => {
-  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     fullname: '',
     username: '',
@@ -14,35 +12,7 @@ const EditProfileModal = ({ authUser }) => {
     currentPassword: ''
   });
 
-  const { mutate: updateProfile, isPending: isUpdatingProfile } = useMutation({
-    mutationFn: async () => {
-      try {
-        const res = await fetch('/api/users/update', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error || 'Something went wrong');
-        }
-
-        return data;
-      } catch (error) {
-        throw new Error(error.message);
-      }
-    },
-    onSuccess: (data) => {
-      toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
-      queryClient.invalidateQueries({ queryKey: ['authUser'] });
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-    }
-  });
+  const { updateProfile, isUpdatingProfile } = useUpdateUserProfile();
 
   // React's onChange handler relies on the name attribute to correctly update the corresponding key in the formData object.
   const handleInputChange = (e) => {
@@ -50,7 +20,7 @@ const EditProfileModal = ({ authUser }) => {
   };
 
   useEffect(() => {
-    if ('authUser') {
+    if (authUser) {
       setFormData({
         fullname: authUser.fullname,
         username: authUser.username,
@@ -79,7 +49,7 @@ const EditProfileModal = ({ authUser }) => {
             className="flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              updateProfile();
+              updateProfile(formData);
             }}>
             <div className="flex flex-wrap gap-2">
               <input
