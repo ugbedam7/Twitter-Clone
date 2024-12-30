@@ -6,7 +6,6 @@ import {
   deleteProfileImageFromCloudinary,
   uploadProfileImageToCloudinary
 } from '../services/cloudinary.js';
-import { validateUpdateProfile } from '../services/userValidation.js';
 
 // @Get User Controller
 export const getUserProfile = async (req, res) => {
@@ -134,26 +133,19 @@ export const getSuggestedUsers = async (req, res) => {
 // @Update User Profile API
 export const updateUserProfile = async (req, res) => {
   const userId = req.user._id;
-  let { profileImg, coverImg } = req.body;
 
-  // Input validation
-  const { error, value } = validateUpdateProfile(req.body);
-  if (error) {
-    return res.status(400).json({
-      success: false,
-      message: 'Invalid input',
-      errors: error.details.map((err) => err.message)
-    });
-  }
-
-  // Destructure validated input
   const { fullname, email, username, currentPassword, newPassword, bio, link } =
-    value;
+    req.body;
+
+  let { profileImg, coverImg } = req.body;
 
   try {
     let user = await User.findById(userId);
     if (!user)
-      return res.status(404).json({ success: false, error: 'User not found' });
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
 
     // Password update logic
     if (currentPassword && newPassword) {
@@ -186,6 +178,7 @@ export const updateUserProfile = async (req, res) => {
         profileImg,
         'X-Profile_Images'
       );
+
       profileImg = uploadedResponse.secure_url;
     }
 
@@ -203,22 +196,13 @@ export const updateUserProfile = async (req, res) => {
       coverImg = uploadedResponse.secure_url;
     }
 
-    // Update user fields
-    const updateFields = [
-      'fullname',
-      'email',
-      'username',
-      'bio',
-      'link',
-      'profileImg',
-      'coverImg'
-    ];
-
-    updateFields.forEach((field) => {
-      if (value[field]) {
-        user[field] = value[field];
-      }
-    });
+    user.fullname = fullname || user.fullname;
+    user.email = email || user.email;
+    user.username = username || user.username;
+    user.bio = bio || user.bio;
+    user.link = link || user.link;
+    user.profileImg = profileImg || user.profileImg;
+    user.coverImg = coverImg || user.coverImg;
 
     user = await user.save({ validateModifiedOnly: true });
     // Prepare response (exclude sensitive data)
@@ -230,7 +214,7 @@ export const updateUserProfile = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'User updated successfully',
+      message: 'Profile updated successfully',
       user: updatedUser
     });
   } catch (err) {

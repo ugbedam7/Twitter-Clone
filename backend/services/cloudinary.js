@@ -1,7 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import logger from '../lib/utils/logger.js';
 import dotenv from 'dotenv';
-import { response } from 'express';
 dotenv.config();
 
 // Configure Cloudinary with your credentials
@@ -41,6 +40,7 @@ export const uploadPostImageToCloudinary = async (file, folder) => {
       folder: `${folder}`,
       transformation: [{ width: 500, crop: 'scale' }, { quality: 'auto' }]
     });
+
     logger.info(`Successfully uploaded post image`);
     return updloadResponse;
   } catch (err) {

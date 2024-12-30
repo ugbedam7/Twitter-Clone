@@ -107,7 +107,7 @@ const NotificationPage = () => {
   return (
     <>
       <div className="flex-[4_4_0] border-l border-r border-gray-700 min-h-screen overflow-hidden">
-        <div className="fixed top-0 w-[53.5%] shadow-md bg-[rgba(0,0,0,0.5)]">
+        <div className="fixed top-0 w-[53.5%] z-10 shadow-md bg-[rgba(0,0,0,0.5)]">
           <div className="flex justify-between items-center p-4 z-10">
             <p className="font-bold text-xl">Notifications</p>
             <div className="dropdown ">
@@ -197,7 +197,7 @@ const NotificationPage = () => {
                 {notification.type === 'comment' ? (
                   <div className="comment flex-1">
                     <div className="flex gap-2">
-                      <Link to={`/profile/${notification.from.username}`}>
+                      <Link to={`/${notification.from.username}/profile`}>
                         <span className="font-bold text-white pr-1">
                           {notification.from.fullname}
                         </span>
@@ -210,7 +210,7 @@ const NotificationPage = () => {
                     </div>
                     <p className="text-gray-500">
                       Replying to{' '}
-                      <Link to={`/profile/${notification.to.username}`}>
+                      <Link to={`/${notification.to.username}/profile`}>
                         <span className="text-blue-500 mt-2">
                           @{notification.to.username}
                         </span>
@@ -233,7 +233,7 @@ const NotificationPage = () => {
                   <>
                     <div className="flex gap-1">
                       <span className="font-bold">
-                        <Link to={`/profile/${notification.from.username}`}>
+                        <Link to={`/${notification.from.username}/profile`}>
                           @{notification.from.username}
                         </Link>
                       </span>{' '}

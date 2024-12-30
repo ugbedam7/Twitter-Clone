@@ -1,25 +1,4 @@
-import Joi from 'joi';
 import { z } from 'zod';
-
-// Define Profile validation schema with Joi
-export const validateUpdateProfile = (data) => {
-  const schema = Joi.object({
-    fullname: Joi.string().min(2).max(50),
-    email: Joi.string().email(),
-    username: Joi.string().alphanum().min(3).max(30),
-    currentPassword: Joi.string(),
-    newPassword: Joi.string().min(6).when('currentPassword', {
-      is: Joi.exist(),
-      then: Joi.required()
-    }),
-    bio: Joi.string().max(160),
-    link: Joi.string().uri(),
-    profileImg: Joi.string(),
-    coverImg: Joi.string()
-  }).with('currentPassword', 'newPassword');
-
-  return schema.validate(data, { abortEarly: false });
-};
 
 // Define sign up validation schema with Zod
 export const signUpSchema = z.object({

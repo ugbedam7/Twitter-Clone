@@ -136,18 +136,18 @@ const Post = ({ post }) => {
       <div className="flex gap-2 items-start p-4 border-b border-gray-700">
         <div className="avatar">
           <Link
-            to={`/profile/${postOwner.username}`}
+            to={`/${postOwner.username}/profile`}
             className="w-8 rounded-full overflow-hidden">
             <img src={postOwner.profileImg || '/avatar-placeholder.png'} />
           </Link>
         </div>
         <div className="flex flex-col ">
           <div className="flex gap-2 items-center">
-            <Link to={`/profile/${postOwner.username}`} className="font-bold">
+            <Link to={`/${postOwner.username}/profile`} className="font-bold">
               {postOwner.fullname}
             </Link>
             <span className="text-gray-700 flex gap-1 text-lg">
-              <Link to={`/profile/${postOwner.username}`}>
+              <Link to={`/${postOwner.username}/profile`}>
                 @{postOwner.username}
               </Link>
               <span>·</span>

@@ -6,12 +6,15 @@ import {
   getUserProfile,
   updateUserProfile
 } from '../controllers/user.controller.js';
+import multer from 'multer';
+
+const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });
 
 const router = express.Router();
 
 router.get('/:username/profile', protectRoute, getUserProfile);
 router.get('/suggested', protectRoute, getSuggestedUsers);
 router.post('/:id/follow', protectRoute, followUnfollowUser);
-router.patch('/profile/update', protectRoute, updateUserProfile);
+router.post('/update', protectRoute, updateUserProfile);
 
 export default router;
