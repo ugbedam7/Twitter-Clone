@@ -3,11 +3,8 @@ import daisyUIThemes, { black } from 'daisyui/src/theming/themes';
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    './index.html',
-    './src/**/*.{js,ts,jsx,tsx}',
-    './frontend/src/**/*.{js,ts,jsx,tsx}'
-  ],
+  important: true,
+  content: ['./dist/**/*.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {}
   },
