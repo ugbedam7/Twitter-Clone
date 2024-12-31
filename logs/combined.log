@@ -4,3 +4,5 @@
 2024-12-31 02:08:57 [info]: Connected to database on port: 27017
 2024-12-31 02:11:13 [info]: Server running on port 8000
 2024-12-31 02:11:27 [info]: Connected to database on port: 27017
+2024-12-31 02:42:23 [info]: Server running on port 8000 in production mode
+2024-12-31 02:42:28 [info]: Connected to database on port: 27017

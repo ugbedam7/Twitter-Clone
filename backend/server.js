@@ -45,6 +45,6 @@ app.use((err, req, res, next) => {
 
 // Server start up
 app.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT}`);
+  logger.info(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
   dbConnect();
 });
