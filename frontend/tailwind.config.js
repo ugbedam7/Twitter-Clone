@@ -4,7 +4,7 @@ import daisyUIThemes, { black } from 'daisyui/src/theming/themes';
 /** @type {import('tailwindcss').Config} */
 export default {
   important: true,
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  content: [],
   theme: {
     extend: {}
   },
