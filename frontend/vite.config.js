@@ -12,11 +12,15 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Splitting vendor libraries
+          vendor: ['react', 'react-dom', 'react-router-dom']
+        }
+      }
+    }
   }
 });
-
-/**
- * The proxy key inside server tells Vite to forward requests starting with /api
- * to the target server (http://localhost:8000). This way, your frontend will
- * route /api requests to the backend, avoiding CORS issues during development.
- */
