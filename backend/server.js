@@ -37,6 +37,12 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  logger.error(err.message); // Log the error message
+  res.status(err.status || 500).json({ error: err.message });
+});
+
 // Server start up
 app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);
